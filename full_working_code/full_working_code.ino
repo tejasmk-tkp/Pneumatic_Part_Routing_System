@@ -1,104 +1,87 @@
 //Limit Switches
-const int L1 = 0;
-const int L2 = 1;
-const int L3 = 2;
-const int L4 = 3;
-const int L5 = 4;
-const int L6 = 5;
+const int L0 = 8;
+const int L1 = 9;
+const int L2 = 10;
+const int L3 = 11;
+const int L4 = A0;
+const int L5 = A1;
 
 //Object Sensor
-const int sensorPin = 6;
+const int IR = 12;
 
 //Solenoid Pins
-const int S1 = 7;
-const int S2 = 8;
-const int S3 = 9;
-const int S4 = 10;
-const int S5 = 11;
-const int S6 = 12;
-
-//Push Button
-const int buttonPin = 13;
-
-//Push Button Variables
-int buttonState = LOW;  // Current state of the button
-int lastButtonState = LOW;  // Previous state of the button
-unsigned long lastDebounceTime = 0;  // Last time the button state changed
-unsigned long debounceDelay = 50;  // Debounce delay in milliseconds
-
-int currentSolenoid = S1;
+const int S0 = 2;
+const int S1 = 3;
+const int S2 = 4;
+const int S3 = 5;
+const int S4 = 6;
+const int S5 = 7;
 
 void setup() {
-  // put your setup code here, to run once:
+
+  pinMode(L0, INPUT);
   pinMode(L1, INPUT);
   pinMode(L2, INPUT);
   pinMode(L3, INPUT);
   pinMode(L4, INPUT);
   pinMode(L5, INPUT);
-  pinMode(L6, INPUT);
 
-  pinMode(sensorPin, INPUT);
+  pinMode(IR, INPUT);
 
+  pinMode(S0, OUTPUT);
   pinMode(S1, OUTPUT);
   pinMode(S2, OUTPUT);
   pinMode(S3, OUTPUT);
   pinMode(S4, OUTPUT);
   pinMode(S5, OUTPUT);
-  pinMode(S6, OUTPUT);
 
-  pinMode(buttonPin, INPUT);
-
+  digitalWrite(S0, LOW);
   digitalWrite(S1, LOW);
   digitalWrite(S2, LOW);
   digitalWrite(S3, LOW);
   digitalWrite(S4, LOW);
   digitalWrite(S5, LOW);
-  digitalWrite(S6, LOW);
+
+  Serial.begin(9600);
 }
 
 void loop() {
-  // Read the button state
-  int reading = digitalRead(buttonPin);
-  int sensorReading = digitalRead(sensorPin);
-
-  // Check if the button state has changed and debounce it
-  if (reading != lastButtonState) {
-    lastDebounceTime = millis();
-  }
-
-  // Check if the button state has been stable for the debounce delay
-  if ((millis() - lastDebounceTime) > debounceDelay) {
-    // If the button state has changed and is HIGH (pressed), and the sensor input is LOW, execute your code
-    if (reading == HIGH && buttonState == LOW && sensorReading == LOW) {
-      // Your code to run once when the button is pressed and the sensor input is low
+  if (Serial.available()){ //&& digitalRead(IR)==LOW) {
+    //Actuate A
+    digitalWrite(S0, HIGH);
+    //Actuate B
+    if (digitalRead(L1)==HIGH) {
+      delay(1000);
+      digitalWrite(S3, HIGH);
+    }
+    //Actuate C
+    if (digitalRead(L3)==LOW) {
+      delay(1000);
+      digitalWrite(S5, HIGH);
+    }
+    //Retract A
+    if (analogRead(L5)<50 && digitalRead(IR)==HIGH) {
+      delay(1000);
+      digitalWrite(S0, LOW);
       digitalWrite(S1, HIGH);
-      if (digitalRead(L2) == HIGH) {
-        digitalWrite(S3, HIGH);
-      }
-      if (digitalRead(L4) == HIGH) {
-        digitalWrite(S5, HIGH);
-      }
-      if (digitalRead(L6) == HIGH) {
-        digitalWrite(S5, LOW);
-        digitalWrite(S6, HIGH);
-      }
-      if (digitalRead(L5) == HIGH) {
-        digitalWrite(S3, LOW);
-        digitalWrite(S4, HIGH);
-      }
-      if (digitalRead(L3) == HIGH) {
-        digitalWrite(S1, LOW);
-        digitalWrite(S2, HIGH);
-      }
-
-      // Remember the button state
-      buttonState = HIGH;
-    } else if (reading == LOW && buttonState == HIGH) {
-      // Reset the button state when the button is released
-      buttonState = LOW;
+    }
+    //Retract B
+    if (digitalRead(L0)==HIGH) {
+      delay(1000);
+      digitalWrite(S3, LOW);
+      digitalWrite(S2, HIGH);
+    }
+    //Retract C
+    if (digitalRead(L2)==HIGH) {
+      delay(1000);
+      digitalWrite(S5, LOW);
+      digitalWrite(S4, HIGH);
+    }
+    if (analogRead(L4)<50) {
+      delay(1000);
+      digitalWrite(S1, LOW);
+      digitalWrite(S2, LOW);
+      digitalWrite(S4, LOW);
     }
   }
-
-  // Store the current button state for the next iteration
-  lastButtonState = reading;
 }
