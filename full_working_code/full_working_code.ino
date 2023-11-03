@@ -46,7 +46,7 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available()){ //&& digitalRead(IR)==LOW) {
+  //if (Serial.available()>0){ //&& digitalRead(IR)==LOW) {
     //Actuate A
     digitalWrite(S0, HIGH);
     //Actuate B
@@ -57,7 +57,7 @@ void loop() {
     //Actuate C
     if (digitalRead(L3)==LOW) {
       delay(1000);
-      digitalWrite(S5, HIGH);
+      digitalWrite(S4, HIGH);
     }
     //Retract A
     if (analogRead(L5)<50 && digitalRead(IR)==HIGH) {
@@ -74,14 +74,15 @@ void loop() {
     //Retract C
     if (digitalRead(L2)==HIGH) {
       delay(1000);
-      digitalWrite(S5, LOW);
-      digitalWrite(S4, HIGH);
+      digitalWrite(S4, LOW);
+      digitalWrite(S5, HIGH);
     }
+    //Turn off all relays
     if (analogRead(L4)<50) {
       delay(1000);
       digitalWrite(S1, LOW);
       digitalWrite(S2, LOW);
-      digitalWrite(S4, LOW);
+      digitalWrite(S5, LOW);
     }
   }
 }
